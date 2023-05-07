@@ -1,42 +1,43 @@
 const express = require('express');
 const db = require('../models');
+const Sequelize = require('sequelize');
 
 const User = db.users;
 
 // avoid if username and email already exists
-const checkDuplicate = (req, res, next) => {
-    // Username
-    User.findOne({
-        where: {
-            username: req.body.username,
-        },
-    }).then((user) => {
-        if (user) {
-            res.status(400).send({
-                message: 'Username already exists',
-            });
-            return;
+const saveUser = async (req, res, next) => {
+    //search the database to see if user exist
+    try {
+        const username = await User.findOne({
+            where: {
+                username: {
+                    [Sequelize.Op.eq]: req.body.username,
+                },
+            },
+        });
+        //if username exist in the database respond with a status of 409
+        if (username) {
+            return res.json(409).send("username already taken");
         }
 
-        // Email
-        User.findOne({
+        //checking if email already exist
+        const emailcheck = await User.findOne({
             where: {
-                email: req.body.email,
-            },
-        }).then((user) => {
-            if (user) {
-                res.status(400).send({
-                    message: 'Email already exists',
-                });
-                return;
+                email: {
+                    [Sequelize.Op.eq]: req.body.email,
+                }
             }
-            next();
         });
-    });
+
+        //if email exist in the database respond with a status of 409
+        if (emailcheck) {
+            return res.json(409).send("Authentication failed");
+        }
+
+        next();
+    } catch (error) {
+        console.log(error);
+    }
 };
 
-const userAuth = {
-    checkDuplicate,
-};
-
-module.exports = userAuth;
+module.exports = saveUser;

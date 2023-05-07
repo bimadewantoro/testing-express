@@ -6,7 +6,7 @@ const userAuth = require('../middlewares/user.auth');
 const router = express.Router();
 
 // Register
-router.post('/register', userAuth.checkDuplicate, register);
+router.post('/register', userAuth, register);
 
 // Login
 router.post('/login', login);
