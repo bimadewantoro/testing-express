@@ -1,9 +1,6 @@
 const express = require('express');
-// const sequelize = require('sequelize');
-// const  = require('dotenv');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-// const db = require('./src/models');
 const userRoute = require('./src/routes/user.route');
 const env = require('dotenv').config();
 
@@ -23,11 +20,6 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
-
-// Sync database
-// db.sequelize.sync({force: true}).then(() => {
-//     console.log('Drop and re-sync db.');
-// });
 
 // Routes
 app.use('/api/user', userRoute);
