@@ -1,11 +1,13 @@
 {
   "name": "testing",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "lint": "eslint src/"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
@@ -23,6 +25,7 @@
     "svg-captcha": "^1.4.0"
   },
   "devDependencies": {
+    "eslint": "^8.40.0",
     "nodemon": "^2.0.22"
   }
 }

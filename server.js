@@ -1,10 +1,11 @@
 const express = require('express');
-const sequelize = require('sequelize');
-const dotenv = require('dotenv');
+// const sequelize = require('sequelize');
+// const  = require('dotenv');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const db = require('./src/models');
+// const db = require('./src/models');
 const userRoute = require('./src/routes/user.route');
+const env = require('dotenv').config();
 
 // Setting up app-port
 const PORT = process.env.PORT || 3001;
@@ -24,9 +25,9 @@ app.get('/', (req, res) => {
 });
 
 // Sync database
-db.sequelize.sync({force: true}).then(() => {
-    console.log('Drop and re-sync db.');
-});
+// db.sequelize.sync({force: true}).then(() => {
+//     console.log('Drop and re-sync db.');
+// });
 
 // Routes
 app.use('/api/user', userRoute);
