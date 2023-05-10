@@ -2,7 +2,6 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-const getCaptcha = require('../utils/captcha/captcha.util');
 
 /**
  * Register a new user
@@ -220,21 +219,5 @@ exports.changePassword = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).send('Internal Server Error');
-    }
-}
-
-/**
- * Generate Captcha for User Session
- *
- * @param req
- * @param res
- * @use getCaptcha
- */
-exports.getCaptcha = async (req, res) => {
-    try {
-        const captcha = await getCaptcha();
-        res.status(200).json(captcha);
-    } catch (error) {
-        console.error(`Error processing getCaptcha request: ${error.message}`);
     }
 }
