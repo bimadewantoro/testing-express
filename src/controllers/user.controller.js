@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const getCaptcha = require('../utils/captcha/captcha.util');
 
 /**
  * Register a new user
@@ -31,6 +32,7 @@ exports.postRegister = async (req, res) => {
                 email: req.body.email,
                 password: hashedPassword,
             });
+
             const newUser = await user.createUser();
             const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
                 expiresIn: 86400, // 24 hours
@@ -157,12 +159,6 @@ exports.getUserProfile = async (req, res) => {
  * @param req
  * @param res
  */
-/**
- * Change user password with JWT
- *
- * @param req
- * @param res
- */
 exports.changePassword = async (req, res) => {
     try {
         // Get JWT token from Authorization header
@@ -192,7 +188,7 @@ exports.changePassword = async (req, res) => {
         }
 
         // Check if new password is different from old passwords
-        const findUserPasswords = 'SELECT password_hash FROM password_history WHERE user_id = $1 ORDER BY changed_at DESC LIMIT 4';
+        const findUserPasswords = 'SELECT password_hash FROM password_history WHERE user_id = $1 ORDER BY changed_at DESC LIMIT 3';
         const passwordValues = [userId];
         const passwordRows = await db.query(findUserPasswords, passwordValues);
         for (const row of passwordRows.rows) {
@@ -224,5 +220,21 @@ exports.changePassword = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).send('Internal Server Error');
+    }
+}
+
+/**
+ * Generate Captcha for User Session
+ *
+ * @param req
+ * @param res
+ * @use getCaptcha
+ */
+exports.getCaptcha = async (req, res) => {
+    try {
+        const captcha = await getCaptcha();
+        res.status(200).json(captcha);
+    } catch (error) {
+        console.error(`Error processing getCaptcha request: ${error.message}`);
     }
 }

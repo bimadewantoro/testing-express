@@ -1,8 +1,9 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const userRoute = require('./src/routes/user.route');
 const env = require('dotenv').config();
+const userRoute = require('./src/routes/user.route');
+const captchaRoute = require('./src/routes/captcha.route');
 
 // Setting up app-port
 const PORT = process.env.PORT || 3001;
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/user', userRoute);
+app.use('/api/captcha', captchaRoute);
 
 // Listen to port
 app.listen(PORT, () => {
