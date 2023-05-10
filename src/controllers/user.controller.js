@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const UserRole = require('../models/authorization/userRole.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
@@ -51,7 +52,7 @@ exports.postRegister = async (req, res) => {
  */
 exports.postLogin = async (req, res) => {
     try {
-        const validateUser = 'SELECT * FROM users WHERE email = $1';
+        const validateUser = 'SELECT * FROM users WHERE email = \$1';
         const values = [req.body.email];
         const { rows } = await db.query(validateUser, values);
         if (!rows[0]) {
@@ -66,10 +67,24 @@ exports.postLogin = async (req, res) => {
         if (!validPassword) {
             return res.status(401).send('Invalid Password');
         }
+        // // Get User Role from user_role table
+        // const findUserRole = 'SELECT * FROM user_role WHERE user_id = \$1';
+        // const userRoleValues = [rows[0].id];
+        // const userRoleResult = await db.query(findUserRole, userRoleValues);
+        // const userRole = userRoleResult.rows[0];
+        // console.log('User Role:', userRole);
+        //
+        // // Get Role from roles table
+        // const findRole = 'SELECT * FROM roles WHERE id = \$1';
+        // const roleValues = [userRole.role_id];
+        // const roleResult = await db.query(findRole, roleValues);
+        // const role = roleResult.rows[0].name
+        // console.log("Role:", role);
+
         const token = jwt.sign({ id: rows[0].id }, process.env.JWT_SECRET, {
             expiresIn: 86400, // 24 hours
         });
-        res.status(200).json({user, token});
+        res.status(200).json({ user, token });
     } catch (error) {
         console.log(error);
     }
