@@ -1,7 +1,5 @@
 const db = require('../config/db');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
-const Role = require('../models/authorization/role.model');
 
 function verifyRole(roles) {
     return async (req, res, next) => {
@@ -15,9 +13,12 @@ function verifyRole(roles) {
                             JOIN roles r ON ur.role_id = r.id
                             WHERE u.id = \$1`;
             const result = await db.query(query, [userId]);
-            const userRole = result.rows[0]?.name;
+            const userRole = result.rows[0]?.name.trim();
+            console.log('userRole:', userRole);
+            console.log('roles:', roles);
 
-            const hasRole = roles.includes(userRole);
+            const hasRole = Array.isArray(roles) ? roles.includes(userRole) : roles === userRole;
+            console.log('hasRole:', hasRole);
             if (!hasRole) {
                 return res.status(403).json ({
                     message: 'You do not have permission to perform this action'
