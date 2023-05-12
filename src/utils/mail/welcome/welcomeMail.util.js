@@ -1,7 +1,7 @@
 const fs = require('fs');
 const mustache = require('mustache');
 const transporter = require('../sendMail.util');
-const {outGoingEmail} = require("../outgoingMail.util");
+const {outGoingEmail, errorOutgoingEmail} = require("../outgoingMail.util");
 require('dotenv').config();
 
 module.exports = {
@@ -25,6 +25,7 @@ module.exports = {
         transporter.sendMail(mail, (err, info) => {
             if (err) {
                 console.log(err);
+                    errorOutgoingEmail('Signup', mail.from, mail.to, mail.subject, mail.html, new Date(9999, 12, 31));
             } else {
                 console.log(info);
             }

@@ -11,4 +11,15 @@ const outGoingEmail = async (category, sender, recipienTo, subject, body, sentAt
     }
 }
 
-module.exports = { outGoingEmail };
+const errorOutgoingEmail = async (category, sender, recipientTo, subject, body, sentAt) => {
+    try {
+        const query = 'UPDATE outgoing_emails SET category = $1, sender = $2, recipient_to = $3, subject = $4, body = $5, sent_at = $6 WHERE recipient_to = $3';
+        const values = [category, sender, recipientTo, subject, body, sentAt];
+        const { rows } = await db.query(query, values);
+        return rows[0];
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports = { outGoingEmail, errorOutgoingEmail };
