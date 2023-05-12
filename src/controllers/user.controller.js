@@ -1,8 +1,23 @@
 const User = require('../models/user.model');
-const UserRole = require('../models/authorization/userRole.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const send = require('../utils/mail/welcome/welcomeMail.util');
+
+const generatePassword = () => {
+    // Generate a random password with 8-12 characters using numbers, uppercase and lowercase letters.
+    const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let password = '';
+    for (let i = 0; i < 8 + Math.floor(Math.random() * 5); i++) {
+        password += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    // Ensure that password contains at least one number
+    const regex = /\d/;
+    if (!regex.test(password)) {
+        password = password.slice(0, -1) + Math.floor(Math.random() * 10);
+    }
+    return password;
+};
 
 /**
  * Register a new user
@@ -20,25 +35,28 @@ exports.postRegister = async (req, res) => {
             return res.status(409).send('Username or Email already taken');
         }
         // Password must contain 8-12 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,12}$/gm;
-        if (!passwordRegex.test(req.body.password)) {
-            return res.status(400).send('Password must contain 8-12 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character');
-        } else {
+        // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,12}$/gm;
+        // if (!passwordRegex.test(req.body.password)) {
+        //     return res.status(400).send('Password must contain 8-12 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character');
+        // } else {
             // Hash password
+            const password = generatePassword();
             const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            const hashedPassword = await bcrypt.hash(password, salt);
             const user = new User({
                 username: req.body.username,
                 email: req.body.email,
                 password: hashedPassword,
             });
-
             const newUser = await user.createUser();
             const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
                 expiresIn: 86400, // 24 hours
             });
+
+            // Send Welcome Email
+            await send.sendMailRegister(newUser, password);
+
             res.status(201).json({newUser, token});
-        }
     } catch (error) {
         console.log(error);
     }
@@ -67,19 +85,6 @@ exports.postLogin = async (req, res) => {
         if (!validPassword) {
             return res.status(401).send('Invalid Password');
         }
-        // // Get User Role from user_role table
-        // const findUserRole = 'SELECT * FROM user_role WHERE user_id = \$1';
-        // const userRoleValues = [rows[0].id];
-        // const userRoleResult = await db.query(findUserRole, userRoleValues);
-        // const userRole = userRoleResult.rows[0];
-        // console.log('User Role:', userRole);
-        //
-        // // Get Role from roles table
-        // const findRole = 'SELECT * FROM roles WHERE id = \$1';
-        // const roleValues = [userRole.role_id];
-        // const roleResult = await db.query(findRole, roleValues);
-        // const role = roleResult.rows[0].name
-        // console.log("Role:", role);
 
         const token = jwt.sign({ id: rows[0].id }, process.env.JWT_SECRET, {
             expiresIn: 86400, // 24 hours
