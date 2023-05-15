@@ -6,7 +6,7 @@ require('dotenv').config();
 
 module.exports = {
     async sendMailRegister(newUser, password) {
-        const template = fs.readFileSync('./src/utils/mail/welcome/welcome.html', 'utf-8');
+        const template = fs.readFileSync('./utils/mail/welcome/welcome.html', 'utf-8');
 
         const mail = {
             to: newUser.email,

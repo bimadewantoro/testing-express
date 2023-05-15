@@ -2,10 +2,10 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const env = require('dotenv').config();
-const userRoute = require('./src/routes/user.route');
-const captchaRoute = require('./src/routes/captcha.route');
-const testRolesRoute = require('./src/routes/testRoles.route');
-const authorizationRoute = require('./src/routes/authorization.route');
+const userRoute = require('./routes/user.route');
+const captchaRoute = require('./routes/captcha.route');
+const testRolesRoute = require('./routes/testRoles.route');
+const authorizationRoute = require('./routes/authorization.route');
 
 // Setting up app-port
 const PORT = process.env.PORT || 3001;
