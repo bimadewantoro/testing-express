@@ -22,6 +22,19 @@ exports.postRegister = async (req, res) => {
         if (rows[0]) {
             return responseStatus(res, 400, 'Username or Email already taken', null, true);
         }
+
+        // Validate format email
+        const validateEmail = /\S+@\S+\.\S+/;
+        if (!validateEmail.test(req.body.email)) {
+            return responseStatus(res, 400, 'Invalid email format', null, true);
+        }
+
+        // Validate Username
+        const validateUsername = /^[a-zA-Z0-9]+$/;
+        if (!validateUsername.test(req.body.username)) {
+            return responseStatus(res, 400, 'Invalid username format', null, true);
+        }
+
         const password = generatePassword();
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
