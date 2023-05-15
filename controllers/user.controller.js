@@ -72,6 +72,19 @@ exports.postLogin = async (req, res) => {
             email: rows[0].email,
             password: rows[0].password,
         });
+
+        // Verify password not expired
+        const expiredPassword = 'SELECT * FROM password_history WHERE user_id = $1 ORDER BY changed_at DESC LIMIT 1';
+        const valuesExpired = [rows[0].id];
+        const { rows: expires_at } = await db.query(expiredPassword, valuesExpired);
+        if (expires_at[0]) {
+            const now = new Date();
+            const expires = new Date(expires_at[0].expires_at);
+            if (now > expires) {
+                return responseStatus(res, 401, 'Password expired, please change your password !', null, true);
+            }
+        }
+
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if (!validPassword) {
             return responseStatus(res, 401, 'Invalid password', null, true);
@@ -170,9 +183,8 @@ exports.getUserProfile = async (req, res) => {
     }
 }
 
-
 /**
- * Change Password with save 3 previous passwords
+ * Change Password and save 3 previous passwords
  *
  * @param req
  * @param res
@@ -218,7 +230,7 @@ exports.changePassword = async (req, res) => {
             if (newPassword && newPassword.trim() !== '') { // Add check to ensure newPassword is not empty or null
                 const isMatch = await bcrypt.compare(newPassword, row.password_hash);
                 if (isMatch) {
-                    return responseStatus(res, 400, 'New password must be different from previous passwords', null, true);
+                    return responseStatus(res, 400, 'New password must be different from last 3 previous passwords', null, true);
                 }
             }
         }
@@ -232,9 +244,13 @@ exports.changePassword = async (req, res) => {
         const userValues = [hashedPassword, userId];
         await db.query(updateUserPassword, userValues);
 
+        // Password Expires in 90 days
+        const passwordExpiresAt = new Date();
+        passwordExpiresAt.setDate(passwordExpiresAt.getDate() + 90);
+
         // Save new password in user_passwords table
-        const insertUserPassword = 'INSERT INTO password_history (user_id, password_hash) VALUES ($1, $2)';
-        const insertValues = [userId, hashedPassword];
+        const insertUserPassword = 'INSERT INTO password_history (user_id, password_hash, expires_at) VALUES ($1, $2, $3)';
+        const insertValues = [userId, hashedPassword, passwordExpiresAt];
         await db.query(insertUserPassword, insertValues);
 
         return responseStatus(res, 200, 'Password changed successfully', null, false);
