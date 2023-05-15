@@ -25,12 +25,13 @@
     "pg-hstore": "^2.3.4",
     "pug": "^3.0.2",
     "redis": "^4.6.6",
-    "sequelize": "^6.31.1",
     "svg-captcha": "^1.4.0",
     "xss": "^1.0.14"
   },
   "devDependencies": {
     "eslint": "^8.40.0",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "sequelize": "^6.31.1",
+    "sequelize-cli": "^6.6.0"
   }
 }

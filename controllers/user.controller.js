@@ -5,6 +5,7 @@ const db = require('../config/db');
 const send = require('../utils/mail/welcome/welcomeMail.util');
 const generatePassword = require('./helpers/generatePassword.helper');
 const responseStatus = require('./helpers/response.helper');
+const validatePassword = require('./helpers/validationPassword.helper');
 
 /**
  * Register a new user
@@ -204,7 +205,12 @@ exports.changePassword = async (req, res) => {
             return responseStatus(res, 401, 'Invalid password', null, true);
         }
 
-        // Check if new password is different from old passwords
+        // Validate Password
+        if (!validatePassword(newPassword)) {
+            return responseStatus(res, 400, 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number and one special character', null, true);
+        }
+
+        // Check if new password is different from 3 old passwords
         const findUserPasswords = 'SELECT password_hash FROM password_history WHERE user_id = $1 ORDER BY changed_at DESC LIMIT 3';
         const passwordValues = [userId];
         const passwordRows = await db.query(findUserPasswords, passwordValues);
@@ -234,6 +240,6 @@ exports.changePassword = async (req, res) => {
         return responseStatus(res, 200, 'Password changed successfully', null, false);
     } catch (error) {
         console.log(error);
-        return responseStatus(res, 500, 'Internal Server Error', null, true);
+        return responseStatus(res, 500, error.message, null, true);
     }
 }
