@@ -1,4 +1,5 @@
 const CaptchaUtil = require('../utils/captcha/captcha.util');
+const responseStatus = require('./helpers/response.helper');
 
 // Define textCaptcha and expiryTime globally
 let textCaptcha;
@@ -18,6 +19,7 @@ exports.getCaptcha = async (req, res) => {
         res.type('svg').status(200).send(captcha.data);
     } catch (error) {
         console.log(error);
+        return responseStatus(res, error.status, error.message, null, true);
     }
 }
 
@@ -32,14 +34,15 @@ exports.postCaptcha = async (req, res) => {
         const { captcha } = req.body;
         if (expiryTime && Date.now() < expiryTime) {
             if (captcha === textCaptcha) {
-                res.status(200).send('Captcha is correct');
+                return responseStatus(res, 200, 'Captcha is valid', null, false);
             } else {
-                res.status(400).send('Captcha is incorrect');
+                return responseStatus(res, 400, 'Captcha is invalid', null, true);
             }
         } else {
-            res.status(400).send('Captcha has expired');
+            return responseStatus(res, 400, 'Captcha has expired', null, true);
         }
     } catch (error) {
         console.log(error);
+        return responseStatus(res, error.status, error.message, null, true);
     }
 }

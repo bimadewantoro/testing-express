@@ -26,7 +26,8 @@
     "pug": "^3.0.2",
     "redis": "^4.6.6",
     "sequelize": "^6.31.1",
-    "svg-captcha": "^1.4.0"
+    "svg-captcha": "^1.4.0",
+    "xss": "^1.0.14"
   },
   "devDependencies": {
     "eslint": "^8.40.0",
