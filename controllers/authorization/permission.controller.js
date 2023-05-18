@@ -1,4 +1,4 @@
-const Permission = require('../../models/authorization/permission.model');
+const Permission = require('../../models/authorization/permission.model')
 
 /**
  * Create a new permission
@@ -7,14 +7,14 @@ const Permission = require('../../models/authorization/permission.model');
  * @param res
  */
 exports.createPermission = async (req, res) => {
-    try {
-        const { permission } = req.body;
-        const newPermission = new Permission({ permission });
-        const createdPermission = await newPermission.createPermission();
-        res.status(201).send(createdPermission);
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    const { permission } = req.body
+    const newPermission = new Permission({ permission })
+    const createdPermission = await newPermission.createPermission()
+    res.status(201).send(createdPermission)
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 /**
@@ -24,12 +24,12 @@ exports.createPermission = async (req, res) => {
  * @param res
  */
 exports.getPermission = async (req, res) => {
-    try {
-        const { permission } = req.params;
-        const newPermission = new Permission({ permission });
-        const foundPermission = await newPermission.getPermission();
-        res.status(200).send(foundPermission);
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    const { permission } = req.params
+    const newPermission = new Permission({ permission })
+    const foundPermission = await newPermission.getPermission()
+    res.status(200).send(foundPermission)
+  } catch (error) {
+    console.log(error)
+  }
 }

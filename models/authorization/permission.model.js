@@ -1,29 +1,23 @@
-const db = require('../../config/db');
+const db = require('../../config/db')
 
 class Permission {
-    constructor(data) {
-        this.permission = data.permission;
-    }
+  constructor (data) {
+    this.permission = data.permission
+  }
 
-    async createPermission() {
-        try {
-            const queryText = 'INSERT INTO permissions (name) VALUES ($1) RETURNING *';
-            const values = [this.permission];
-            const { rows } = await db.query(queryText, values);
-            return rows[0];
-        } catch (error) {
-            throw error;
-        }
-    }
+  createPermission () {
+    const queryText = 'INSERT INTO permissions (name) VALUES ($1) RETURNING *'
+    const values = [this.permission]
+    return db.query(queryText, values)
+      .then(({ rows }) => rows[0])
+  }
 
-    async getPermission() {
-        try {
-            const queryText = 'SELECT * FROM permissions WHERE name = $1';
-            const values = [this.permission];
-            const {rows} = await db.query(queryText, values);
-            return rows[0];
-        } catch (error) {
-            throw error;
-        }
-    }
+  getPermission () {
+    const queryText = 'SELECT * FROM permissions WHERE name = $1'
+    const values = [this.permission]
+    return db.query(queryText, values)
+      .then(({ rows }) => rows[0])
+  }
 }
+
+module.exports = Permission
