@@ -102,7 +102,7 @@ exports.uploadCsvFile = async (req, res) => {
                                 ]);
                             } else {
                                 // Row already exists, add it to existingData array
-                                existingData.push(row);
+                                existingRows.push(row);
                             }
                         }
 
@@ -122,7 +122,7 @@ exports.uploadCsvFile = async (req, res) => {
                         const getAllRows = 'SELECT * FROM merchants';
                         const { rows: success } = await db.query(getAllRows);
 
-                        responseStatus(res, 200, 'File uploaded successfully', {success, emptyRows, invalidPostalCode}, false);
+                        responseStatus(res, 200, 'File uploaded successfully', {success, failed:{emptyRows, invalidPostalCode}}, false);
                     } catch (error) {
                         responseStatus(res, 500, error.message, null, true);
                     }
