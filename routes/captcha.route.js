@@ -1,12 +1,12 @@
-const express = require('express');
-const captchaController = require('../controllers/captcha.controller');
+const express = require('express')
+const captchaController = require('../controllers/captcha.controller')
 
-const router = express.Router();
+const router = express.Router()
 
 // Get captcha
-router.get('/', captchaController.getCaptcha);
+router.get('/', captchaController.getCaptcha)
 
 // Post captcha
-router.post('/', captchaController.postCaptcha);
+router.post('/', captchaController.postCaptcha)
 
-module.exports = router;
+module.exports = router

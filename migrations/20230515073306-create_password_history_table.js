@@ -1,5 +1,3 @@
-'use strict';
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -10,31 +8,31 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await queryInterface.createTable('password_history', {
-        id: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        user_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'users',
-                key: 'id',
-            },
-        },
-        password_hash: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
-        changed_at: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        },
-        expires_at: {
-            type: Sequelize.DATE,
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id'
         }
-    });
+      },
+      password_hash: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      changed_at: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      expires_at: {
+        type: Sequelize.DATE
+      }
+    })
   },
 
   async down (queryInterface, Sequelize) {
@@ -44,6 +42,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('password_history');
+    await queryInterface.dropTable('password_history')
   }
-};
+}
