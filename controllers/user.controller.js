@@ -36,12 +36,13 @@ exports.postRegister = async (req, res) => {
     }
 
     const password = generatePassword()
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(11)
     const hashedPassword = await bcrypt.hash(password, salt)
     const user = new User({
       username: req.body.username,
       email: req.body.email,
-      password: hashedPassword
+      password: hashedPassword,
+      mobileNumber: req.body.mobileNumber
     })
     const newUser = await user.createUser()
 
@@ -52,6 +53,11 @@ exports.postRegister = async (req, res) => {
 
     // Send Welcome Email
     await send.sendMailRegister(newUser, password)
+
+    // Saved Password in History
+    const passwordHistory = 'INSERT INTO password_history (user_id, password_hash, expires_at) VALUES ($1, $2, $3)'
+    const valuesPassword = [newUser.id, hashedPassword, new Date(Date.now() + 86400000)] // Password expires in 24 hours
+    await db.query(passwordHistory, valuesPassword)
 
     const data = {
       user: newUser,
@@ -246,7 +252,7 @@ exports.changePassword = async (req, res) => {
     }
 
     // Hash new password
-    const salt = await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(11)
     const hashedPassword = await bcrypt.hash(newPassword, salt)
 
     // Update user password in the database

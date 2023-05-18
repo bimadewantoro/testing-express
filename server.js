@@ -2,6 +2,8 @@ const express = require('express')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const verifyJWT = require('./middlewares/verifyJWT.middleware')
+const xssMiddleware = require('./middlewares/xss.middleware')
 
 // Routes
 const userRoute = require('./routes/user.route')
@@ -23,7 +25,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: allowedOrigins,
-  credentials: false
+  credentials: true
 }))
 
 // Setting up body-parser
@@ -32,6 +34,12 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 
 // Setting up cookie-parser
 app.use(cookieParser())
+
+// Verify JWT
+app.use(verifyJWT())
+
+// XSS middleware
+app.use(xssMiddleware)
 
 // Get Hello World
 app.get('/', (req, res) => {
