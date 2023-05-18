@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 function verifyJWT () {
   return (req, res, next) => {
     try {
-      const token = req.headers.authorization.split(' ')[1]
+      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null
       if (token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
           if (err) {
@@ -14,9 +14,12 @@ function verifyJWT () {
           req.decodedToken = decodedToken
           next()
         })
+      } else {
+        next()
       }
     } catch (error) {
       console.log(error)
+      next(error)
     }
   }
 }
