@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const verifyJWT = require('./middlewares/verifyJWT.middleware')
 const xssMiddleware = require('./middlewares/xss.middleware')
+const temperingMiddleware = require('./middlewares/tempering.middleware')
 
 // Routes
 const userRoute = require('./routes/user.route')
@@ -41,9 +42,12 @@ app.use(verifyJWT())
 // XSS middleware
 app.use(xssMiddleware)
 
+// Tempering middleware
+// app.use(temperingMiddleware)
+
 // Get Hello World
 app.get('/', (req, res) => {
-  res.send('Hello World')
+  res.send('Successfully connected to the server !')
 })
 
 // Routes
