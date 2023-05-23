@@ -1,33 +1,35 @@
 const crypto = require('crypto');
+const responseStatus = require('../controllers/helpers/response.helper');
 require('dotenv').config();
 
-const responseStatus = require('../controllers/helpers/response.helper');
-const secretKey = process.env.TEMPERING_SECRET_KEY;
+let key = process.env.TEMPERING_SECRET_KEY;
+let secretKey = Buffer.from(key, 'utf8');
 
 function verifySignature(req, res, next) {
-    if (req.method === 'GET') {
+    try {
+        const { method, headers, body } = req;
+        const { 'x-signature': signature } = headers;
+
         // Skip verification for GET requests
+        if (method === 'GET') {
+            return next();
+        }
+
+        const hmac = crypto.createHmac('sha512', secretKey);
+        hmac.update(JSON.stringify(body));
+        const generatedHmac = hmac.digest('hex');
+
+        console.log('Key:', generatedHmac);
+        console.log('Signature:', signature);
+
+        if (generatedHmac !== signature) {
+            return responseStatus(res, 401, 'Invalid Signature !', null);
+        }
+
         return next();
+    } catch (error) {
+        return responseStatus(res, 500, error.message, null);
     }
-
-    const receivedHMAC = req.headers['X-signature'];
-
-    if (!receivedHMAC) {
-        responseStatus(res, 401, 'No Signature Received !', null);
-        return;
-    }
-
-    const hmac = crypto.createHmac('sha512', secretKey);
-    hmac.update(JSON.stringify(req.body));
-
-    const calculatedHMAC = hmac.digest('hex');
-
-    if (receivedHMAC !== calculatedHMAC) {
-        responseStatus(res, 401, 'Invalid Signature !', null);
-        return;
-    }
-
-    next();
 }
 
 module.exports = verifySignature;
