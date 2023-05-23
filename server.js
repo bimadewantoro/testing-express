@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const verifyJWT = require('./middlewares/verifyJWT.middleware')
-const xssMiddleware = require('./middlewares/xss.middleware')
+const verifySignature = require('./middlewares/tempering.middleware')
 
 // Routes
 const userRoute = require('./routes/user.route')
@@ -20,13 +20,20 @@ const app = express()
 
 // Allow cross-origin requests
 const allowedOrigins = [
-  'http://localhost:3001'
+  'http://localhost:3000'
 ]
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    // Check if the request origin is allowed
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
-}))
+}));
 
 // Setting up body-parser
 app.use(bodyParser.json({ limit: '50mb' }))
@@ -38,12 +45,12 @@ app.use(cookieParser())
 // Verify JWT
 app.use(verifyJWT())
 
-// XSS middleware
-app.use(xssMiddleware)
+// Tempering middleware
+app.use(verifySignature)
 
 // Get Hello World
 app.get('/', (req, res) => {
-  res.send('Hello World')
+  res.send('Successfully connected to the server !')
 })
 
 // Routes
