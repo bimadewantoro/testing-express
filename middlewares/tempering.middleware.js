@@ -10,17 +10,14 @@ function verifySignature(req, res, next) {
         const { method, headers, body } = req;
         const { 'x-signature': signature } = headers;
 
-        // Skip verification for GET requests
-        if (method === 'GET') {
+        // Skip verification for GET requests and form-data
+        if (method === 'GET' || req.is('multipart/form-data')) {
             return next();
         }
 
         const hmac = crypto.createHmac('sha512', secretKey);
         hmac.update(JSON.stringify(body));
         const generatedHmac = hmac.digest('hex');
-
-        console.log('Key:', generatedHmac);
-        console.log('Signature:', signature);
 
         if (generatedHmac !== signature) {
             return responseStatus(res, 401, 'Invalid Signature !', null);
