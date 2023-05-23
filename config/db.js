@@ -11,18 +11,29 @@ const pool = new Pool({
 
 module.exports = {
   async query (text, params) {
+    const client = await pool.connect()
     const start = Date.now()
+
     try {
-      const res = await pool.query(text, params)
+      // Begin a transaction
+      await client.query('BEGIN')
+
+      const res = await client.query(text, params)
       const duration = Date.now() - start
-      console.log(
-        'executed query',
-        { text, duration, rows: res.rowCount }
-      )
+
+      // Commit the transaction if the query was successful
+      await client.query('COMMIT')
+
+      console.log('executed query', { text, duration, rows: res.rowCount })
       return res
     } catch (error) {
+      // Rollback the transaction if an error occurs
+      await client.query('ROLLBACK')
       console.log('Error in query:', { text })
       throw error
+    } finally {
+      // Release the client back to the pool
+      client.release()
     }
   }
 }

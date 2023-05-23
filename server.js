@@ -27,13 +27,13 @@ app.use(cors({
   origin: function (origin, callback) {
     // Check if the request origin is allowed
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+      callback(null, true)
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'))
     }
   },
   credentials: true
-}));
+}))
 
 // Setting up body-parser
 app.use(bodyParser.json({ limit: '50mb' }))
